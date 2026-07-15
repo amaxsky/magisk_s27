@@ -21,11 +21,11 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Setup JDK 21
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: "21"
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -35,30 +35,42 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
             git \
             zip \
             unzip \
+            curl \
+            wget \
             clang \
             lld \
             cmake \
             ninja-build \
             ccache
 
-      - name: Accept Android licenses
+      - name: Accept Android Licenses
         run: yes | sdkmanager --licenses
+
+      - name: Install Magisk NDK
+        run: |
+          python3 build.py ndk
 
       - name: Build
         run: |
-          chmod +x build.py
           python3 build.py all
 
-      - name: Upload Artifacts
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Magisk-S27
-          path: |
-            out/*
+          name: Magisk-APK
+          path: out/app-release.apk
+          if-no-files-found: warn
+
+      - name: Upload Outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: Magisk-Out
+          path: out/**
+          if-no-files-found: warn
