@@ -21,6 +21,11 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Init submodules
+        run: |
+         git submodule sync --recursive
+         git submodule update --init --recursive
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
